@@ -16,6 +16,8 @@
         </ion-toolbar>
       </ion-header>
     
+      <ion-button @click="onClickGallery">gallery</ion-button>
+
       <div id="container">
         <strong class="capitalize">{{ $route.params.id }}</strong>
         <p>Explore <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
@@ -26,11 +28,12 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { IonButtons, IonButton, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 
 export default defineComponent({
   name: 'FolderPage',
   components: {
+    IonButton,
     IonButtons,
     IonContent,
     IonHeader,
@@ -38,6 +41,11 @@ export default defineComponent({
     IonPage,
     IonTitle,
     IonToolbar
+  },
+  methods: {
+    onClickGallery() {
+      this.$router.push('/album')
+    }
   }
 });
 </script>
