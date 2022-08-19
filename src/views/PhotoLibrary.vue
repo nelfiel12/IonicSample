@@ -1,5 +1,4 @@
 <template>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: gap: ws: https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: cdvphotolibrary:">
     <ion-page>
         <ion-header :translucent="true">
         <ion-toolbar>
