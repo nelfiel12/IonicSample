@@ -23,7 +23,10 @@ const routes: Array<RouteRecordRaw> = [
     path:'/image',
     component: () => import('../views/ImagePage.vue'),
   },
-
+  {
+    path:'/lazyload',
+    component: () => import('../views/LazyLoadPage.vue'),
+  },
 ]
 
 const router = createRouter({
