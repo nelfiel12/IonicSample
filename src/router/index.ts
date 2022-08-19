@@ -15,9 +15,15 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/AlbumPage.vue'),
   },  
   {
+    path:'/photolib',
+    component: () => import('../views/PhotoLibrary.vue'),
+  },
+  
+  {
     path:'/image',
     component: () => import('../views/ImagePage.vue'),
-  }
+  },
+
 ]
 
 const router = createRouter({
