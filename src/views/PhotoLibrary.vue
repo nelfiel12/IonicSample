@@ -12,10 +12,10 @@
             <img :src="src" />
         </ion-content>
         <ion-content>
-            <!-- <img :src="'cdvphotolibrary://thumbnail?photoId=23393%3B%2Fstorage%2Femulated%2F0%2F%EB%B3%B4%EA%B3%A0%EC%9B%8D%EC%8A%A4%2Fa07cc0fc-9a94-84dc-daa6-b74429fe0091_1648022634239.png&width=512&height=384&quality=0.5'" /> -->
             <div class="layout_grid">
-                <div v-for="item in list ?? []"  :key="item" class="album_item" @click="onClickItem(item)">
-                    {{item}}
+                <div v-for="item in list"  :key="item" class="album_item" @click="onClickItem(item)">
+                    <img v-lazyload :data-id="item.id" :data-type="item.mimeType" />
+                    <p>{{item.id}}</p>
                 </div>
             </div>
         </ion-content>
@@ -24,9 +24,37 @@
 
 <script>
 import { IonButtons, IonButton, IonContent, IonHeader, IonBackButton, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
-import { PhotoLibrary } from '@ionic-native/photo-library'
+import { PhotoLibrary, PhotoLibraryOriginal } from '@ionic-native/photo-library'
+
+const io = new IntersectionObserver((entries, observer) => {
+    entries.forEach(async entry => {
+        if(entry.isIntersecting) {
+            const id = entry.target.dataset.id;
+
+            const ret = await PhotoLibrary.getThumbnail(id)
+
+            const buf = await ret.arrayBuffer()
+
+            if(buf && buf.byteLength) {                
+                entry.target.src = "data:image;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(buf)))
+            }
+            
+            observer.unobserve(entry.target)
+        }
+    })
+})
 
 export default {
+    directives : {        
+        lazyload : {
+            mounted(el) {
+                io.observe(el)
+            },
+            unmounted(el) {
+                io.unobserve(el)
+            }
+        }
+    },
     components: {
         IonButtons,
         IonContent,
@@ -39,7 +67,7 @@ export default {
     },
     data() {
         return {
-            list : null,
+            list : [],
             src : null
         };
     },
@@ -74,7 +102,6 @@ export default {
             })
         },
         async onClickItem(item) {
-            
             this.src = item.url
         }
     }
