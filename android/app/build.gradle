@@ -46,6 +46,7 @@ dependencies {
     implementation project(':capacitor-cordova-android-plugins')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "androidx.webkit:webkit:1.4.0"
 }
 
 apply from: 'capacitor.build.gradle'
