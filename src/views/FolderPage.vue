@@ -19,6 +19,7 @@
       <ion-button @click="onClickGallery">gallery</ion-button>
       <ion-button @click="$router.push('/photolib')">photolib</ion-button>
       <ion-button @click="$router.push('/lazyload')">Image LazaLoad</ion-button>
+      <ion-button @click="$router.push('/canvas')">Crop sample</ion-button>
 
       <div id="container">
         <strong class="capitalize">{{ $route.params.id }}</strong>

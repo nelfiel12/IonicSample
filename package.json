@@ -22,6 +22,7 @@
     "cordova-plugin-file": "^7.0.0",
     "cordova-plugin-photo-library": "^2.3.1",
     "core-js": "^3.6.5",
+    "panzoom": "^9.4.3",
     "vue": "^3.2.21",
     "vue-router": "^4.0.12"
   },

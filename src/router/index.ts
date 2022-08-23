@@ -27,6 +27,10 @@ const routes: Array<RouteRecordRaw> = [
     path:'/lazyload',
     component: () => import('../views/LazyLoadPage.vue'),
   },
+  {
+    path:'/canvas',
+    component: () => import('../views/ImagePage.vue'),
+  },
 ]
 
 const router = createRouter({

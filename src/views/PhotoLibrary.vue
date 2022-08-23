@@ -9,13 +9,13 @@
         </ion-toolbar>
         </ion-header>
         <ion-content>
-            <img :src="src" />
+            <img :src="item?.url" @click="onClickImg"/>
         </ion-content>
         <ion-content>
             <div class="layout_grid">
                 <div v-for="item in list"  :key="item" class="album_item" @click="onClickItem(item)">
                     <img v-lazyload :data-id="item.id" :data-type="item.mimeType" />
-                    <p>{{item.id}}</p>
+                    <p>{{item}}</p>
                 </div>
             </div>
         </ion-content>
@@ -68,7 +68,7 @@ export default {
     data() {
         return {
             list : [],
-            src : null
+            item : null
         };
     },
     mounted() {
@@ -102,7 +102,17 @@ export default {
             })
         },
         async onClickItem(item) {
-            this.src = item.url
+            this.item = item
+        },
+        onClickImg() {
+            if(this.item) {
+                this.$router.push({ 
+                        path : '/image',
+                        query : {
+                            item : JSON.stringify(this.item)
+                        }
+                    })
+            }
         }
     }
   
