@@ -12,6 +12,7 @@
             <div style="display: flex">
                 <ion-button @click="onClickCut" >Cut</ion-button>
                 <ion-button @click="onClickTest" >Test</ion-button>
+                <ion-button @click="onClickResize" >Resize</ion-button>
             </div>
             <div style="height: 100px" >
                 <img style="height: 100%" :src="dstImage" />
@@ -634,6 +635,22 @@ export default {
             this.pointerIds.delete(event.pointerId)
             console.log('pt cancel')
         },        
+        onClickResize() {
+            const canvas = this.$refs.canvas
+             
+            let outCanvas = document.createElement('canvas')
+            const w = canvas.width / 2
+            const h = canvas.height / 2
+            outCanvas.width = w
+            outCanvas.height = h
+
+            const outCtx = outCanvas.getContext('2d')
+
+            outCtx.drawImage(canvas,0, 0, w, h)
+
+            this.dstImage = outCanvas.toDataURL()
+            return
+        }
     }
 }
 </script>
