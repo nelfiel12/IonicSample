@@ -98,6 +98,15 @@ function hitTest(pt, mousePt) {
         pt.y + size >= mousePt.y
 }
 
+
+function moveValue(value) {
+    if(value < 1)
+        return value
+
+    return Math.max(value / 10, 1)
+}
+
+
 export default {
     components: {
         // PinchZoomVue,
@@ -130,7 +139,8 @@ export default {
             dstImage : null,
 
             capturePointId : null,
-            pointerIds : new Set()
+            pointerIds : new Set(),
+            isAnimate : false
         }
     },
     mounted() {       
@@ -588,6 +598,7 @@ export default {
                 this.capturePointId = null
                 
                 this.panzoom.resume()
+                this.cropEndAction()
             }        
         },
         onPointerMove(event) {
@@ -634,6 +645,8 @@ export default {
         onPointerCancel(event) {
             this.pointerIds.delete(event.pointerId)
             console.log('pt cancel')
+
+            this.cropEndAction()
         },        
         onClickResize() {
             const canvas = this.$refs.canvas
@@ -649,6 +662,67 @@ export default {
             outCtx.drawImage(canvas,0, 0, w, h)
 
             this.dstImage = outCanvas.toDataURL()
+            return
+        },
+        cropEndActionRun() {
+            const rect = Object.assign(new Rect(), this.cropRect)
+
+            const crop_canvas = this.$refs.crop_canvas
+
+            if(rect.width > crop_canvas.width) {
+                rect.width = crop_canvas.width
+            }
+                
+
+            if(rect.height > crop_canvas.height) {
+                rect.height = crop_canvas.height
+            }
+                
+
+            if(rect.x < 0) {
+                // rect.x = 0
+                rect.x += moveValue(-rect.x)
+            }
+            else if(crop_canvas.width < rect.x + rect.width) {
+                rect.x -= moveValue((rect.x + rect.width) - crop_canvas.width)
+                // rect.x -= (rect.x + rect.width) - crop_canvas.width
+                // rect.x -= 1
+            }
+                
+            if(rect.y < 0) {
+                // rect.y = 0
+                rect.y += moveValue(-rect.y)
+            }
+            else if(crop_canvas.height < rect.y + rect.height) {
+                rect.y -= moveValue((rect.y + rect.height) - crop_canvas.height)
+
+                // rect.y -= (rect.y + rect.height) - crop_canvas.height
+                // rect.y -= 1
+            }
+
+            //console.log(rect)
+
+            if(this.cropRect.x != rect.x ||
+                this.cropRect.y != rect.y ||
+                this.cropRect.width != rect.width ||
+                this.cropRect.height != rect.height) {
+                this.cropRect = rect
+
+                this.draw()
+
+                this.isAnimate = true
+                window.requestAnimationFrame(this.cropEndActionRun)
+                console.log('animate')
+            } else {
+                this.isAnimate = false
+            }
+        },
+        cropEndAction() {
+
+            if(!this.isAnimate) {
+                this.cropEndActionRun()
+            }
+
             return
         }
     }
