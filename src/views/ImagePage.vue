@@ -100,10 +100,17 @@ function hitTest(pt, mousePt) {
 
 
 function moveValue(value) {
-    if(value < 1)
+    if(Math.abs(value) < 1)
         return value
 
-    return Math.max(value / 10, 1)
+    let ret = value
+
+    if(value > 0)
+        ret = Math.max(value / 10, 1)
+    else if(value < 0)
+        ret = Math.min(value / 10, -1)
+
+    return ret
 }
 
 
@@ -140,7 +147,8 @@ export default {
 
             capturePointId : null,
             pointerIds : new Set(),
-            isAnimate : false
+            isAnimate : false,
+            toAnimateRect : null
         }
     },
     mounted() {       
@@ -665,62 +673,68 @@ export default {
             return
         },
         cropEndActionRun() {
-            const rect = Object.assign(new Rect(), this.cropRect)
+            console.log('animate')
 
-            const crop_canvas = this.$refs.crop_canvas
+            const from = this.cropRect
+            const to = this.toAnimateRect
 
-            if(rect.width > crop_canvas.width) {
-                rect.width = crop_canvas.width
-            }
-                
+            if(from.x != to.x || from.y != to.y || from.width != to.width || from.height != to.height) {
 
-            if(rect.height > crop_canvas.height) {
-                rect.height = crop_canvas.height
-            }
-                
+                from.x += moveValue(to.x - from.x)
+                from.y += moveValue(to.y - from.y)
 
-            if(rect.x < 0) {
-                // rect.x = 0
-                rect.x += moveValue(-rect.x)
-            }
-            else if(crop_canvas.width < rect.x + rect.width) {
-                rect.x -= moveValue((rect.x + rect.width) - crop_canvas.width)
-                // rect.x -= (rect.x + rect.width) - crop_canvas.width
-                // rect.x -= 1
-            }
-                
-            if(rect.y < 0) {
-                // rect.y = 0
-                rect.y += moveValue(-rect.y)
-            }
-            else if(crop_canvas.height < rect.y + rect.height) {
-                rect.y -= moveValue((rect.y + rect.height) - crop_canvas.height)
+                from.width += moveValue(to.width - from.width)
+                from.height += moveValue(to.height - from.height)
 
-                // rect.y -= (rect.y + rect.height) - crop_canvas.height
-                // rect.y -= 1
-            }
-
-            //console.log(rect)
-
-            if(this.cropRect.x != rect.x ||
-                this.cropRect.y != rect.y ||
-                this.cropRect.width != rect.width ||
-                this.cropRect.height != rect.height) {
-                this.cropRect = rect
-
-                this.draw()
+                this.cropRect = from
 
                 this.isAnimate = true
                 window.requestAnimationFrame(this.cropEndActionRun)
-                console.log('animate')
+                
             } else {
                 this.isAnimate = false
             }
+            
+            this.draw()
+
+            return
         },
         cropEndAction() {
 
             if(!this.isAnimate) {
-                this.cropEndActionRun()
+                const rect = Object.assign(new Rect(), this.cropRect)
+                const crop_canvas = this.$refs.crop_canvas
+
+                if(rect.width > crop_canvas.width) {
+                    rect.width = crop_canvas.width
+                }
+
+                if(rect.height > crop_canvas.height) {
+                    rect.height = crop_canvas.height
+                }
+
+                if(rect.x < 0) {
+                    rect.x = 0
+                }
+                else if(crop_canvas.width < rect.x + rect.width) {
+                    rect.x -= (rect.x + rect.width) - crop_canvas.width
+                }
+                    
+                if(rect.y < 0) {
+                    rect.y = 0
+                }
+                else if(crop_canvas.height < rect.y + rect.height) {
+                    rect.y -= (rect.y + rect.height) - crop_canvas.height
+                }
+
+                if(this.cropRect.x != rect.x ||
+                    this.cropRect.y != rect.y ||
+                    this.cropRect.width != rect.width ||
+                    this.cropRect.height != rect.height) {
+                    this.toAnimateRect = rect
+
+                    this.cropEndActionRun()                
+                }
             }
 
             return
