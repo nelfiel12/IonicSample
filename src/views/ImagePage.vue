@@ -11,11 +11,12 @@
         <ion-content :fullscreen="true">
             <div style="display: flex">
                 <ion-button @click="onClickCut" >Cut</ion-button>
+                <ion-button @click="onClickTest" >Test</ion-button>
             </div>
             <div style="height: 100px" >
                 <img style="height: 100%" :src="dstImage" />
             </div>
-            <div style="width: 100%; height:100%; position: relative">
+            <div ref="container" style="width: auto; height:100vw; position: relative; overflow: hidden">
                 <!-- <PinchZoomVue> -->
                 <canvas ref="canvas" style="position: absolute; width: 100%" >
                     <!-- @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mousewheel="onMouseWheel" 
@@ -41,7 +42,7 @@
 import { IonButtons, IonButton, IonContent, IonHeader, IonBackButton, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import { PhotoGallery } from '@/plugins/index'
 import { PhotoLibrary } from '@ionic-native/photo-library';
-import panzoom from 'panzoom'
+import panzoom, { PanZoomController } from 'panzoom'
 
 import { data } from '@/test/data.js'
 
@@ -163,7 +164,6 @@ export default {
 
         
 
-        let ctx = canvas.getContext('2d')
 
         let img = new Image()
         img.onload = function(event) {
@@ -173,8 +173,8 @@ export default {
                 height : event.target.naturalHeight
             }
 
-            this.cropRect.x = 50;
-            this.cropRect.y = 50;
+            this.cropRect.x = 0;
+            this.cropRect.y = 0;
 
             const crop_canvas = this.$refs.crop_canvas
 
@@ -182,16 +182,49 @@ export default {
             crop_canvas.height = this.size.height
 
             this.cropRect.width = canvas.width = this.size.width
-            this.cropRect.height = canvas.height = this.size.height
+            this.cropRect.height = canvas.height = this.size.height            
 
-            this.cropRect.width -= 100
-            this.cropRect.height -= 100
+
+            let ctx = canvas.getContext('2d')
+            ctx.drawImage(this.img, 0, 0)
 
             this.draw()
 
             this.panzoom = panzoom(canvas, {
+                bounds : true,                
                 beforeMouseDown : (e) => {
                     return !this.hit == false
+                },
+                // autocenter : true,
+                controller : {
+                    getOwner : function() {
+                       // return canvas
+                        return this.$refs.container
+                    }.bind(this),
+                    applyTransform : function(transform) {
+                        console.log('apply ' + JSON.stringify(transform))
+
+
+                        const x = transform.x
+                        const y = transform.y
+
+                        const canvas = this.$refs.canvas
+
+                        
+                        canvas.style.transformOrigin = '0 0 0';
+                        canvas.style.transform = 'matrix(' +
+                        transform.scale + ', 0, 0, ' +
+                        transform.scale + ', ' +
+                        transform.x + ', ' + transform.y + ')';
+                    }.bind(this),
+                    getBBox : function () {
+                        return {
+                            left: 0,
+                            top: 0,
+                            width: this.$refs.canvas.clientWidth,
+                            height: this.$refs.canvas.clientHeight,
+                        };
+                    }.bind(this)
                 }
             })
         }.bind(this)
@@ -230,12 +263,11 @@ export default {
 
             const ret = canvas.toDataURL()
 
-
+            this.panzoom.smoothMoveTo(10, 0)
 
             return
         },
         onClickCut() {
-            
             const canvas = this.$refs.canvas
             const crop_canvas = this.$refs.crop_canvas
             const ctx = canvas.getContext('2d')
@@ -414,11 +446,8 @@ export default {
             // transform.y *= rh
 
             {
-                ctx.clearRect(0,0, canvas.width, canvas.height)
-                ctx.drawImage(this.img, 0, 0)
-
-                ctx.strokeStyle = "#FF0000"
-                ctx.strokeRect((rect.x - (transform.x / rw)) / transform.scale, (rect.y - (transform.y / rh)) / transform.scale, rect.width / transform.scale, rect.height / transform.scale)
+                // ctx.clearRect(0,0, canvas.width, canvas.height)
+                // ctx.drawImage(this.img, 0, 0)
             }
 
             {
@@ -426,13 +455,27 @@ export default {
                 const ctx = canvas.getContext('2d')
 
                 ctx.clearRect(0,0, canvas.width, canvas.height)
+                ctx.globalAlpha = 0.5
+                ctx.fillStyle = "rgba(127, 127, 127, 1)"
 
+                ctx.fillRect(0, 0, canvas.width, canvas.height)
 
+                ctx.fillStyle = "rgba(255, 255, 255, 1)"
+
+                ctx.globalCompositeOperation = "destination-out"
+                ctx.globalAlpha = 1
+
+                ctx.fillRect(rect.x, rect.y, rect.width, rect.height)
+
+                ctx.globalCompositeOperation = "source-over"
                 ctx.fillStyle = "#0000FF"
+
 
                 const size = gripSize / rw
                 const sizeHalf = size / 2
                 const lineHeight = size / 8
+
+                
 
                 ctx.fillRect(rect.x, rect.y, sizeHalf, lineHeight)
                 ctx.fillRect(rect.x, rect.y, lineHeight, sizeHalf)                   
