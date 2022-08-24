@@ -17,14 +17,15 @@
             </div>
             <div style="width: 100%; height:100%; position: relative">
                 <!-- <PinchZoomVue> -->
-                <canvas ref="canvas" style="position: absolute" >
+                <canvas ref="canvas" style="position: absolute; width: 100%" >
                     <!-- @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mousewheel="onMouseWheel" 
                     @mouseleave="onMouseLeave" @mouseover="onMouseOver" @mouseout="onMouseOut">                     -->
                 </canvas>
                 <!-- </PinchZoomVue> -->
-                <canvas ref="crop_canvas" style="position: absolute"
+                <canvas ref="crop_canvas" style="position: absolute; width: 100%; touch-action: none"
                     @pointerdown="onPointerDown"
                     @pointerup="onPointerUp"
+                    @pointermove="onPointerMove"
                     
                     @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mousewheel="onMouseWheel" 
                     @mouseleave="onMouseLeave" @mouseover="onMouseOver" @mouseout="onMouseOut">
@@ -44,7 +45,7 @@ import panzoom from 'panzoom'
 
 import { data } from '@/test/data.js'
 
-const gripSize = 40
+const gripSize = 80
 
 class Pt {
     constructor(x, y) {
@@ -57,8 +58,8 @@ class Rect {
     constructor(x, y, w, h) {
         this.x = x ?? 0
         this.y = y ?? 0
-        this.w = w ?? 0
-        this.h = h ?? 0
+        this.width = w ?? 0
+        this.height = h ?? 0
     }
 }
 
@@ -78,6 +79,19 @@ class ActionType {
     static rb = ActionType.r | ActionType.b    
 }
 
+function create(pt, type) {
+    return {
+        pt : pt,
+        type : type
+    }
+}
+
+function hitTest(pt, mousePt) {
+    return pt.x - gripSize <= mousePt.x &&
+        pt.y - gripSize <= mousePt.y &&
+        pt.x + gripSize >= mousePt.x &&
+        pt.y + gripSize >= mousePt.y
+}
 
 export default {
     components: {
@@ -108,7 +122,10 @@ export default {
             isPressed : false,
             hit : null,
 
-            dstImage : null
+            dstImage : null,
+
+            capturePointId : null,
+            pointerIds : new Set()
         }
     },
     mounted() {       
@@ -239,103 +256,122 @@ export default {
 
             return
         },
-        onMouseDown(event) {                                    
-            this.isPressed = true
-            const mousePt = this.downPt = new Pt(event.offsetX, event.offsetY)
+        onMouseDown(event) {                    
+            // console.log('m dw')                
+            // this.isPressed = true
+            // const mousePt = this.downPt = new Pt(event.offsetX, event.offsetY)
 
-            const rect = this.cropRect
+            // const crop_canvas = this.$refs.crop_canvas
 
-            function hitTest(pt) {
-                return pt.x - gripSize <= mousePt.x &&
-                    pt.y - gripSize <= mousePt.y &&
-                    pt.x + gripSize >= mousePt.x &&
-                    pt.y + gripSize >= mousePt.y
-            }
+            // const rw = crop_canvas.clientWidth / crop_canvas.width
+            // const rh = crop_canvas.clientHeight / crop_canvas.height
+
+            // const rect = Object.assign(new Rect(), this.cropRect)
+
+            // rect.x *= rw
+            // rect.y *= rh
+            // rect.width *= rw
+            // rect.height *= rw
+
+            // function hitTest(pt) {
+            //     return pt.x - gripSize <= mousePt.x &&
+            //         pt.y - gripSize <= mousePt.y &&
+            //         pt.x + gripSize >= mousePt.x &&
+            //         pt.y + gripSize >= mousePt.y
+            // }
 
 
-            const lt = new Pt(rect.x, rect.y)
-            const t = new Pt(rect.x + (rect.width / 2), rect.y)
-            const rt = new Pt(rect.x + rect.width, rect.y)
-            const l = new Pt(rect.x, rect.y + (rect.height / 2))
-            const r = new Pt(rect.x + rect.width, rect.y + (rect.height / 2))
-            const lb = new Pt(rect.x, rect.y + rect.height)
-            const b = new Pt(rect.x + (rect.width / 2), rect.y + rect.height)
-            const rb = new Pt(rect.x + rect.width, rect.y + rect.height)
+            // const lt = new Pt(rect.x, rect.y)
+            // const t = new Pt(rect.x + (rect.width / 2), rect.y)
+            // const rt = new Pt(rect.x + rect.width, rect.y)
+            // const l = new Pt(rect.x, rect.y + (rect.height / 2))
+            // const r = new Pt(rect.x + rect.width, rect.y + (rect.height / 2))
+            // const lb = new Pt(rect.x, rect.y + rect.height)
+            // const b = new Pt(rect.x + (rect.width / 2), rect.y + rect.height)
+            // const rb = new Pt(rect.x + rect.width, rect.y + rect.height)
 
-            function create(pt, type) {
-                return {
-                    pt : pt,
-                    type : type
-                }
-            }
+            // function create(pt, type) {
+            //     return {
+            //         pt : pt,
+            //         type : type
+            //     }
+            // }
 
-            let ptList = [
-                create(lt, ActionType.lt),
-                create(t, ActionType.t),
-                create(rt, ActionType.rt),
-                create(l, ActionType.l),
-                create(r, ActionType.r),
-                create(lb, ActionType.lb),
-                create(b, ActionType.b),
-                create(rb, ActionType.rb),
-            ]
+            // let ptList = [
+            //     create(lt, ActionType.lt),
+            //     create(t, ActionType.t),
+            //     create(rt, ActionType.rt),
+            //     create(l, ActionType.l),
+            //     create(r, ActionType.r),
+            //     create(lb, ActionType.lb),
+            //     create(b, ActionType.b),
+            //     create(rb, ActionType.rb),
+            // ]
 
-            if(rect.x <= mousePt.x &&
-                mousePt.x <= rect.x + rect.width &&
-                rect.y <= mousePt.y &&
-                mousePt.y <= rect.y + rect.height
-                )
-                this.hit = create(mousePt, ActionType.center)
+            // if(rect.x <= mousePt.x &&
+            //     mousePt.x <= rect.x + rect.width &&
+            //     rect.y <= mousePt.y &&
+            //     mousePt.y <= rect.y + rect.height
+            //     )
+            //     this.hit = create(mousePt, ActionType.center)
             
 
-            const hit = ptList.find(el => hitTest(el.pt))
+            // const hit = ptList.find(el => hitTest(el.pt))
 
-            if(hit)
-                this.hit = hit
+            // if(hit)
+            //     this.hit = hit
 
-            if(this.hit) {
-                this.srcCropRect = Object.assign({}, this.cropRect)
-                // canvas.setPointerCapture(1)
-            }
+            // if(this.hit) {
+            //     this.srcCropRect = Object.assign({}, this.cropRect)
+            //     // canvas.setPointerCapture(1)
+            // }
 
             return
         },
         onMouseMove(event) {
 
-            const hit = this.hit
+            // const hit = this.hit
 
-            if(hit) {
-                const pt = new Pt(event.offsetX, event.offsetY)
+            // if(hit) {
+            //     const pt = new Pt(event.offsetX, event.offsetY)
                 
-                const downPt = this.hit.pt
-                const offset = new Pt(pt.x - downPt.x, pt.y - downPt.y)
+            //     const crop_canvas = this.$refs.crop_canvas
+
+            //     const rw = crop_canvas.clientWidth / crop_canvas.width
+            //     const rh = crop_canvas.clientHeight / crop_canvas.height
+
+            //     const downPt = this.hit.pt
+            //     const offset = new Pt(pt.x - downPt.x, pt.y - downPt.y)
+
+            //     offset.x /= rw
+            //     offset.y /= rh
                 
-                if(hit.type == ActionType.center) {
-                    this.cropRect.x = this.srcCropRect.x + offset.x
-                    this.cropRect.y = this.srcCropRect.y + offset.y
-                } else {
-                    if(hit.type & ActionType.l) {
-                        this.cropRect.x = this.srcCropRect.x + offset.x
-                        this.cropRect.width = this.srcCropRect.width - offset.x
-                    } else if(hit.type & ActionType.r) {
-                        this.cropRect.width = this.srcCropRect.width + offset.x
-                    }
+            //     if(hit.type == ActionType.center) {
+            //         this.cropRect.x = this.srcCropRect.x + offset.x
+            //         this.cropRect.y = this.srcCropRect.y + offset.y
+            //     } else {
+            //         if(hit.type & ActionType.l) {
+            //             this.cropRect.x = this.srcCropRect.x + offset.x
+            //             this.cropRect.width = this.srcCropRect.width - offset.x
+            //         } else if(hit.type & ActionType.r) {
+            //             this.cropRect.width = this.srcCropRect.width + offset.x
+            //         }
 
-                    if(hit.type & ActionType.t) {
-                        this.cropRect.y = this.srcCropRect.y + offset.y
-                        this.cropRect.height = this.srcCropRect.height - offset.y
-                    } else if(hit.type & ActionType.b) {
-                        this.cropRect.height = this.srcCropRect.height + offset.y
-                    }
-                }
+            //         if(hit.type & ActionType.t) {
+            //             this.cropRect.y = this.srcCropRect.y + offset.y
+            //             this.cropRect.height = this.srcCropRect.height - offset.y
+            //         } else if(hit.type & ActionType.b) {
+            //             this.cropRect.height = this.srcCropRect.height + offset.y
+            //         }
+            //     }
 
-                this.draw()
-            }
+            //     this.draw()
+            // }
             return
         },
         onMouseUp(event) {
-            this.isPressed = false
-            this.hit = null
+            // this.isPressed = false
+            // this.hit = null
             return
         },
         onMouseWheel(event) {
@@ -360,12 +396,19 @@ export default {
             const rect = this.cropRect
             const transform = this.panzoom?.getTransform() ?? {x:0, y:0, scale:0}
 
+            const crop_canvas = this.$refs.crop_canvas
+            const rw = crop_canvas.clientWidth / crop_canvas.width
+            const rh = crop_canvas.clientHeight / crop_canvas.height
+
+            // transform.x *= rw
+            // transform.y *= rh
+
             {
                 ctx.clearRect(0,0, canvas.width, canvas.height)
                 ctx.drawImage(this.img, 0, 0)
 
                 ctx.strokeStyle = "#FF0000"
-                ctx.strokeRect((rect.x - transform.x) / transform.scale, (rect.y - transform.y) / transform.scale, rect.width / transform.scale, rect.height / transform.scale)
+                ctx.strokeRect((rect.x - (transform.x / rw)) / transform.scale, (rect.y - (transform.y / rh)) / transform.scale, rect.width / transform.scale, rect.height / transform.scale)
             }
 
             {
@@ -401,19 +444,139 @@ export default {
             }            
         },
         onPointerDown(event) {
-            console.log('pointer dw')
+            this.pointerIds.add(event.pointerId)
+            console.log('pointer dw ' + event.pointerId)
 
             const crop_canvas = this.$refs.crop_canvas
+            
 
-            crop_canvas.setPointerCapture(event.pointerId)
+            if(!this.capturePointId) {
+                crop_canvas.setPointerCapture(event.pointerId)
+                this.capturePointId = event.pointerId
 
+                this.isPressed = true
+                const mousePt = this.downPt = new Pt(event.offsetX, event.offsetY)
+
+                const rw = crop_canvas.clientWidth / crop_canvas.width
+                const rh = crop_canvas.clientHeight / crop_canvas.height
+
+                const rect = Object.assign(new Rect(), this.cropRect)
+
+                rect.x *= rw
+                rect.y *= rh
+                rect.width *= rw
+                rect.height *= rw
+
+
+
+                const lt = new Pt(rect.x, rect.y)
+                const t = new Pt(rect.x + (rect.width / 2), rect.y)
+                const rt = new Pt(rect.x + rect.width, rect.y)
+                const l = new Pt(rect.x, rect.y + (rect.height / 2))
+                const r = new Pt(rect.x + rect.width, rect.y + (rect.height / 2))
+                const lb = new Pt(rect.x, rect.y + rect.height)
+                const b = new Pt(rect.x + (rect.width / 2), rect.y + rect.height)
+                const rb = new Pt(rect.x + rect.width, rect.y + rect.height)
+
+
+                let ptList = [
+                    create(lt, ActionType.lt),
+                    create(t, ActionType.t),
+                    create(rt, ActionType.rt),
+                    create(l, ActionType.l),
+                    create(r, ActionType.r),
+                    create(lb, ActionType.lb),
+                    create(b, ActionType.b),
+                    create(rb, ActionType.rb),
+                ]
+
+                if(rect.x <= mousePt.x &&
+                    mousePt.x <= rect.x + rect.width &&
+                    rect.y <= mousePt.y &&
+                    mousePt.y <= rect.y + rect.height
+                    )
+                    this.hit = create(mousePt, ActionType.center)
+                
+
+                const hit = ptList.find(el => hitTest(el.pt, mousePt))
+
+                if(hit)
+                    this.hit = hit
+
+                if(this.hit) {
+                    this.srcCropRect = Object.assign({}, this.cropRect)
+                    // canvas.setPointerCapture(1)
+
+                    this.panzoom.pause()
+                }
+            } else {
+                crop_canvas.hasPointerCapture(this.capturePointId)
+                this.isPressed = false
+                this.hit = null
+
+                this.panzoom.resume()
+            }
         },
         onPointerUp(event) {
-            console.log('pointer up')
+            this.pointerIds.delete(event.pointerId)
+            console.log('pointer up ' + event.pointerId)
+            
+            if(event.pointerId == this.capturePointId) {                
+                const crop_canvas = this.$refs.crop_canvas
 
-            const crop_canvas = this.$refs.crop_canvas
+                crop_canvas.releasePointerCapture(event.pointerId)
+                
+                this.isPressed = false
+                this.hit = null
+                this.capturePointId = null
+                
+                this.panzoom.resume()
+            }        
+        },
+        onPointerMove(event) {
+            console.log('pointer move ' + event.pointerId)
 
-            crop_canvas.releasePointerCapture(event.pointerId)
+            const hit = this.hit
+
+            if(hit) {
+                const pt = new Pt(event.offsetX, event.offsetY)
+                
+                const crop_canvas = this.$refs.crop_canvas
+
+                const rw = crop_canvas.clientWidth / crop_canvas.width
+                const rh = crop_canvas.clientHeight / crop_canvas.height
+
+                const downPt = this.hit.pt
+                const offset = new Pt(pt.x - downPt.x, pt.y - downPt.y)
+
+                offset.x /= rw
+                offset.y /= rh
+                
+                if(hit.type == ActionType.center) {
+                    this.cropRect.x = this.srcCropRect.x + offset.x
+                    this.cropRect.y = this.srcCropRect.y + offset.y
+                } else {
+                    if(hit.type & ActionType.l) {
+                        this.cropRect.x = this.srcCropRect.x + offset.x
+                        this.cropRect.width = this.srcCropRect.width - offset.x
+                    } else if(hit.type & ActionType.r) {
+                        this.cropRect.width = this.srcCropRect.width + offset.x
+                    }
+
+                    if(hit.type & ActionType.t) {
+                        this.cropRect.y = this.srcCropRect.y + offset.y
+                        this.cropRect.height = this.srcCropRect.height - offset.y
+                    } else if(hit.type & ActionType.b) {
+                        this.cropRect.height = this.srcCropRect.height + offset.y
+                    }
+                }
+
+                this.draw()
+            }
+        },
+        onPointerCancel(event) {
+            this.pointerIds.delete(event.pointerId)
+            console.log('pt cancel')
         },        
     }
 }
