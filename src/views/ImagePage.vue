@@ -45,7 +45,7 @@ import panzoom from 'panzoom'
 
 import { data } from '@/test/data.js'
 
-const gripSize = 80
+const gripSize = 40
 
 class Pt {
     constructor(x, y) {
@@ -237,15 +237,22 @@ export default {
         onClickCut() {
             
             const canvas = this.$refs.canvas
+            const crop_canvas = this.$refs.crop_canvas
             const ctx = canvas.getContext('2d')
 
             
             const transform = this.panzoom?.getTransform() ?? {x:0, y:0, scale:0}
             const rect = this.cropRect
-
-            const dstData = ctx.getImageData((rect.x - transform.x) / transform.scale, (rect.y - transform.y) / transform.scale, rect.width / transform.scale, rect.height / transform.scale)                       
             
+            const rw = crop_canvas.clientWidth / crop_canvas.width
+            const rh = crop_canvas.clientHeight / crop_canvas.height
 
+            const dstRect = new Rect((rect.x - (transform.x / rw)) / transform.scale, (rect.y - (transform.y / rh)) / transform.scale, rect.width / transform.scale, rect.height / transform.scale);
+
+
+            const dstData = ctx.getImageData(dstRect.x, dstRect.y, dstRect.width, dstRect.height)
+            
+            
             let outCanvas = document.createElement('canvas')
 
             const outCtx = outCanvas.getContext('2d')
