@@ -87,10 +87,13 @@ function create(pt, type) {
 }
 
 function hitTest(pt, mousePt) {
-    return pt.x - gripSize <= mousePt.x &&
-        pt.y - gripSize <= mousePt.y &&
-        pt.x + gripSize >= mousePt.x &&
-        pt.y + gripSize >= mousePt.y
+
+    const size = gripSize / 2
+
+    return pt.x - size <= mousePt.x &&
+        pt.y - size <= mousePt.y &&
+        pt.x + size >= mousePt.x &&
+        pt.y + size >= mousePt.y
 }
 
 export default {
@@ -420,27 +423,28 @@ export default {
 
                 ctx.fillStyle = "#0000FF"
 
-                const gripSizeHalf = gripSize / 2
-                const gripSizeQuarter = gripSize / 4
+                const size = gripSize / rw
+                const sizeHalf = size / 2
+                const lineHeight = size / 8
 
-                ctx.fillRect(rect.x, rect.y, gripSizeQuarter, gripSizeHalf)
-                ctx.fillRect(rect.x, rect.y, gripSizeHalf, gripSizeQuarter)
+                ctx.fillRect(rect.x, rect.y, sizeHalf, lineHeight)
+                ctx.fillRect(rect.x, rect.y, lineHeight, sizeHalf)                   
 
-                ctx.fillRect(rect.x + (rect.width / 2) - gripSizeHalf, rect.y, gripSize, gripSizeQuarter)            
+                ctx.fillRect(rect.x + (rect.width / 2) - sizeHalf, rect.y, size, lineHeight)            
 
-                ctx.fillRect(rect.x + rect.width - gripSizeHalf, rect.y, gripSizeHalf, gripSizeQuarter)
-                ctx.fillRect(rect.x + rect.width - gripSizeQuarter, rect.y, gripSizeQuarter, gripSizeHalf)
+                ctx.fillRect(rect.x + rect.width - sizeHalf, rect.y, sizeHalf, lineHeight)
+                ctx.fillRect(rect.x + rect.width - lineHeight, rect.y, lineHeight, sizeHalf)
 
-                ctx.fillRect(rect.x, rect.y + (rect.height / 2) - gripSizeHalf, gripSizeQuarter, gripSize)
-                ctx.fillRect(rect.x + rect.width - gripSizeQuarter, rect.y + (rect.height / 2) - gripSizeHalf, gripSizeQuarter, gripSize)
+                ctx.fillRect(rect.x, rect.y + (rect.height / 2) - sizeHalf, lineHeight, size)
+                ctx.fillRect(rect.x + rect.width - lineHeight, rect.y + (rect.height / 2) - sizeHalf, lineHeight, size)
 
-                ctx.fillRect(rect.x, rect.y + rect.height - gripSizeHalf, gripSizeQuarter, gripSizeHalf)
-                ctx.fillRect(rect.x, rect.y + rect.height - gripSizeQuarter, gripSizeHalf, gripSizeQuarter)
+                ctx.fillRect(rect.x, rect.y + rect.height - sizeHalf, lineHeight, sizeHalf)
+                ctx.fillRect(rect.x, rect.y + rect.height - lineHeight, sizeHalf, lineHeight)
 
-                ctx.fillRect(rect.x + (rect.width / 2) - gripSizeHalf, rect.y + rect.height - gripSizeQuarter, gripSize, gripSizeQuarter)
+                ctx.fillRect(rect.x + (rect.width / 2) - sizeHalf, rect.y + rect.height - lineHeight, size, lineHeight)
 
-                ctx.fillRect(rect.x + rect.width - gripSizeHalf, rect.y + rect.height - gripSizeQuarter, gripSizeHalf, gripSizeQuarter)
-                ctx.fillRect(rect.x + rect.width - gripSizeQuarter, rect.y + rect.height - gripSizeHalf, gripSizeQuarter, gripSizeHalf)
+                ctx.fillRect(rect.x + rect.width - sizeHalf, rect.y + rect.height - lineHeight, sizeHalf, lineHeight)
+                ctx.fillRect(rect.x + rect.width - lineHeight, rect.y + rect.height - sizeHalf, lineHeight, sizeHalf)
             }            
         },
         onPointerDown(event) {
@@ -500,8 +504,10 @@ export default {
 
                 const hit = ptList.find(el => hitTest(el.pt, mousePt))
 
-                if(hit)
+                if(hit) {
                     this.hit = hit
+                    this.hit.pt = mousePt
+                }
 
                 if(this.hit) {
                     this.srcCropRect = Object.assign({}, this.cropRect)
