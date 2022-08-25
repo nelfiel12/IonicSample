@@ -20,6 +20,7 @@
       <ion-button @click="$router.push('/photolib')">photolib</ion-button>
       <ion-button @click="$router.push('/lazyload')">Image LazaLoad</ion-button>
       <ion-button @click="$router.push('/canvas')">Crop sample</ion-button>
+      <ion-button @click="onClickTest">Test activity</ion-button>
 
       <div id="container">
         <strong class="capitalize">{{ $route.params.id }}</strong>
@@ -32,6 +33,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { IonButtons, IonButton, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { PhotoGallery } from '@/plugins/index'
 
 export default defineComponent({
   name: 'FolderPage',
@@ -48,6 +50,9 @@ export default defineComponent({
   methods: {
     onClickGallery() {
       this.$router.push('/album')
+    },
+    onClickTest() {
+      PhotoGallery.test()
     }
   }
 });

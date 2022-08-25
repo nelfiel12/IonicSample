@@ -1,16 +1,39 @@
 package com.pscheol.ionicsample
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.pscheol.ionicsample.databinding.ActivityTestBinding
 
 class TestActivity : AppCompatActivity() {
 
+    companion object {
+        const val TAG = "TestActivity"
+    }
+
     private lateinit var binding: ActivityTestBinding
+
+    val requestActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            activityResult ->
+
+        val task = GoogleSignIn.getSignedInAccountFromIntent(activityResult.data)
+
+        try {
+            val account = task.getResult(ApiException::class.java)
+
+
+            return@registerForActivityResult
+        } catch (e: ApiException) {
+            Log.w(TAG, "signInResult:failed code=" + e.statusCode);
+
+        }
+    }
 
     private val callabck = object : OAuthLoginCallback {
         override fun onError(errorCode: Int, message: String) {
@@ -47,7 +70,32 @@ class TestActivity : AppCompatActivity() {
         binding.buttonOAuthLoginImg.setOAuthLoginCallback(callabck)
 
         binding.buttonLogin.setOnClickListener {
+            Log.d(TAG, "click")
+
             NaverIdLoginSDK.authenticate(applicationContext, callabck)
+/*
+            val opt = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestId()
+                .requestProfile()
+                .build()
+
+            val client = GoogleSignIn.getClient(applicationContext, opt)
+
+
+
+
+
+
+            val intent = client.signInIntent
+            requestActivity.launch(intent)
+
+ */
         }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }

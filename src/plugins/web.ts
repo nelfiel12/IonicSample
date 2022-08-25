@@ -1001,4 +1001,8 @@ export class PhotoGalleryWeb extends WebPlugin implements PhotoGalleryPlugin {
     async cleanCache() {
         return;
     }
+
+    async test() {
+        return
+    }
   }

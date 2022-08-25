@@ -1,10 +1,13 @@
 package com.pscheol.ionicsample.plugins
 
 import android.Manifest
+import android.content.Intent
+import android.util.Log
 import com.getcapacitor.*
 import com.getcapacitor.annotation.CapacitorPlugin
 import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
+import com.pscheol.ionicsample.TestActivity
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -20,6 +23,7 @@ class PhotoGalleryPlugin : Plugin() {
 
     companion object {
         const val READ_EXTERNAL_STORATE_ALIAS = "read_alias"
+        const val TAG = "PhotoGallery"
     }
 
     lateinit var gallery: PhotoGallery
@@ -206,5 +210,11 @@ class PhotoGalleryPlugin : Plugin() {
 
     private fun callResolve(call: PluginCall) {
 
+    }
+
+    @PluginMethod
+    fun test(call: PluginCall) {
+        activity.startActivity(Intent(activity.applicationContext, TestActivity::class.java))
+        call.resolve()
     }
 }

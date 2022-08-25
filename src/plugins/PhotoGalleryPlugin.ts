@@ -32,4 +32,6 @@ export interface PhotoGalleryPlugin {
     }) : Promise<{ data : string}>;
     
     cleanCache() : Promise<void>;
+
+    test() : Promise<void>;
 }
