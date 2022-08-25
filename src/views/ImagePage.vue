@@ -524,6 +524,9 @@ export default {
             
 
             if(!this.capturePointId) {
+                if(this.isAnimate)
+                    this.toAnimateRect = null
+
                 crop_canvas.setPointerCapture(event.pointerId)
                 this.capturePointId = event.pointerId
 
@@ -675,8 +678,15 @@ export default {
         cropEndActionRun() {
             console.log('animate')
 
-            const from = this.cropRect
             const to = this.toAnimateRect
+
+            if(!to) {
+                this.isAnimate = false
+                return
+            }
+
+            const from = this.cropRect
+            
 
             if(from.x != to.x || from.y != to.y || from.width != to.width || from.height != to.height) {
 
@@ -693,6 +703,7 @@ export default {
                 
             } else {
                 this.isAnimate = false
+                this.toAnimateRect = null
             }
             
             this.draw()
