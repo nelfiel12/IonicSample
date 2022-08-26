@@ -13,6 +13,10 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/album',
     component: () => import('../views/AlbumPage.vue'),
+  },
+  {
+    path: '/images',
+    component: () => import('../views/ImageListPage.vue'),
   },  
   {
     path:'/photolib',

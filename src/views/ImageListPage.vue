@@ -5,14 +5,18 @@
             <ion-buttons slot="start">
                 <ion-back-button default-href="/"></ion-back-button>
             </ion-buttons>
-            <ion-title>Album</ion-title>
+            <ion-title>Images</ion-title>
         </ion-toolbar>
         </ion-header>
         
         <ion-content :fullscreen="true">
+            <div>            
+                {{album}}
+            </div>
+            
             <div class="layout_grid">
-                <div v-for="item in list"  :key="item" class="album_item" @click="onClickItem(item)">
-                    <p>{{item.name}}</p>
+                <div v-for="item in albumData?.items ?? []"  :key="item" class="album_item" @click="onClickItem(item)">
+                    <p>{{item.id}}</p>
                     <img v-lazyload :data-id="item.id" :data-type="item.mediumType" />
                 </div>
                 
@@ -32,10 +36,8 @@ const io = new IntersectionObserver((entries, observer) => {
             const id = entry.target.dataset.id;
             const type = entry.target.dataset.type;
 
-            // await PhotoGallery.getAlbumThumbnail()
-
-            const ret = await PhotoGallery.getAlbumThumbnail({
-                albumId : id,
+            const ret = await PhotoGallery.getThumbnail({
+                mediumId : id,
                 mediumType : type,
                 width : 100,
                 height : 100,
@@ -76,27 +78,43 @@ export default {
         IonBackButton
     },
     data() {
-        return {
-            list : [],            
-            album : {
-                items : []
-            }
+        return {      
+            album : null,
+            albumData : null
         };
     },
     mounted() {
+
+        const json = this.$route.query.json
+
+        if(json) {
+            this.album = JSON.parse(json)
         this.init();
+        }
+
     },
     methods: {
         async init() {
-            const data = await PhotoGallery.listAlbums({ mediumType : "image"});
+            const item = this.album
 
-            if(data.data) {
-                this.list = JSON.parse(data.data);
-            }
+            if(!item)
+                return
+
+            const param = {
+                albumId : item.id,
+                mediumType : item.mediumType,
+                newest : true,
+                total : item.count
+            };
+
+
+            const ret = await PhotoGallery.listMedia(param);
+
+            this.albumData = JSON.parse(ret.data);
         },
         async onClickItem(item) {
             this.$router.push({
-                    path : '/images',
+                    path : '/image',
                     query : {
                         json : JSON.stringify(item)
                     }
@@ -113,8 +131,7 @@ export default {
 <style scoped>
 .layout_grid {
     display: grid;
-    grid: '. . .';
-    /* grid-template-columns: repeat(3, 33%); */
+    grid-template-columns: repeat(3, 1fr);
     /* grid-template-rows: repeat(auto-fill, 33vw); */
     
 }

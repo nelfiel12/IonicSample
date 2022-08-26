@@ -8,10 +8,15 @@ import com.getcapacitor.annotation.CapacitorPlugin
 import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
 import com.pscheol.ionicsample.TestActivity
+import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.*
+
+
+
+
 
 @CapacitorPlugin(
     name = "PhotoGallery",
@@ -26,9 +31,31 @@ class PhotoGalleryPlugin : Plugin() {
         const val TAG = "PhotoGallery"
     }
 
+    class TestRun {
+
+        val call: PluginCall
+        val run: () -> JSObject
+        constructor(call: PluginCall, runnable: () -> JSObject) {
+            this.call = call
+            this.run = runnable
+        }
+
+        fun execute() {
+            Log.d(TAG, "execute")
+            CoroutineScope(Dispatchers.IO).launch {
+                Log.d(TAG, "launch")
+                val ret = run()
+
+                call.resolve(ret)
+                Log.d(TAG, "launch end")
+            }
+        }
+    }
+
     lateinit var gallery: PhotoGallery
 
-    var permissionResultRun: Runnable? = null
+    var permissionResultRun: TestRun? = null
+
 
     override fun load() {
         super.load()
@@ -36,17 +63,22 @@ class PhotoGalleryPlugin : Plugin() {
 
     }
 
-    fun checkPermission(call: PluginCall, runnable: Runnable) {
+    fun checkPermission(call: PluginCall, runnable: () -> JSObject) {
+
+        val execute = TestRun(call, runnable)
+
         if(PermissionState.GRANTED.equals(getPermissionState(READ_EXTERNAL_STORATE_ALIAS))) {
-            runnable.run()
+
+            execute.execute()
         } else {
-            permissionResultRun = runnable
+            permissionResultRun =execute
             requestPermissionForAlias(READ_EXTERNAL_STORATE_ALIAS, call, "handleReadExternalPermissionResult")
         }
     }
 
     @PluginMethod
     fun listAlbums(call: PluginCall) {
+        PluginMethod.RETURN_CALLBACK
         checkPermission(call) {
             val mediumType: String? = call.getString("mediumType")
 
@@ -57,6 +89,12 @@ class PhotoGalleryPlugin : Plugin() {
 
                 val array = JSONArray()
                 for (data in list) {
+
+                    var temp = JSObject()
+                    for(entry in data.entries) {
+                        temp.put(entry.key, entry.value)
+                    }
+
                     var obj = JSONObject(data)
 
                     array.put(obj)
@@ -65,14 +103,14 @@ class PhotoGalleryPlugin : Plugin() {
                 ret.put("data", array.toString())
             }
 
-            call.resolve(ret)
+            ret
         }
     }
 
     @PermissionCallback
     private fun handleReadExternalPermissionResult(call: PluginCall) {
         if(PermissionState.GRANTED.equals(getPermissionState(READ_EXTERNAL_STORATE_ALIAS))) {
-            permissionResultRun?.run()
+            permissionResultRun?.execute()
             permissionResultRun = null
         } else {
             call.reject("Permission failed")
@@ -103,8 +141,7 @@ class PhotoGalleryPlugin : Plugin() {
                     ret.put("data", JSONObject(map).toString())
                 }
             }
-
-            call.resolve(ret)
+            ret
         }
     }
 
@@ -122,8 +159,7 @@ class PhotoGalleryPlugin : Plugin() {
                     ret.put("data", JSONObject(map).toString())
                 }
             }
-
-            call.resolve(ret)
+            ret
         }
     }
 
@@ -147,7 +183,7 @@ class PhotoGalleryPlugin : Plugin() {
                 }
             }
 
-            call.resolve(ret)
+            ret
         }
     }
 
@@ -171,7 +207,7 @@ class PhotoGalleryPlugin : Plugin() {
                 }
             }
 
-            call.resolve(ret)
+            ret
         }
     }
 
@@ -197,7 +233,7 @@ class PhotoGalleryPlugin : Plugin() {
 
             }
 
-            call.resolve(ret)
+            ret
         }
     }
 

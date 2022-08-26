@@ -1005,4 +1005,15 @@ export class PhotoGalleryWeb extends WebPlugin implements PhotoGalleryPlugin {
     async test() {
         return
     }
+
+    
+    async getThumbnail(opts : {
+        mediumId : string,
+        mediumType : string,
+        width : number,
+        height : number,
+        highQuality : boolean
+    }) {
+        return { data : '' }
+    }
   }

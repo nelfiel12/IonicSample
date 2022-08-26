@@ -19,12 +19,12 @@
             </div>
             <div ref="container" style="width: auto; height:100vw; position: relative; overflow: hidden">
                 <!-- <PinchZoomVue> -->
-                <canvas ref="canvas" style="position: absolute; width: 100%" >
+                <canvas ref="canvas" style="position: absolute; width: 100%; height:100%" >
                     <!-- @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mousewheel="onMouseWheel" 
                     @mouseleave="onMouseLeave" @mouseover="onMouseOver" @mouseout="onMouseOut">                     -->
                 </canvas>
                 <!-- </PinchZoomVue> -->
-                <canvas ref="crop_canvas" style="position: absolute; width: 100%; touch-action: none"
+                <canvas ref="crop_canvas" style="position: absolute; width: 100%; height:100%; touch-action: none"
                     @pointerdown="onPointerDown"
                     @pointerup="onPointerUp"
                     @pointermove="onPointerMove"
@@ -130,7 +130,7 @@ export default {
         return {
             panzoom : null,
 
-            image : null,
+            imageItem : null,
             data : null,
             src : null,
             img : null,
@@ -151,39 +151,10 @@ export default {
             toAnimateRect : null
         }
     },
-    mounted() {       
+    mounted() {
         console.log('mounted')
-        const json = this.$route.query.json
-
-        if(json) {
-            this.image = JSON.parse(json)
-            this.init()
-            return
-        } 
-
-        const item = this.$route.query.item
-
-        if(item) {
-            const data = JSON.parse(item)            
-
-            PhotoLibrary.getPhoto(data.id).then(async ret => {
-                const buf = await ret.arrayBuffer()
-
-                if(buf && buf.byteLength) {
-                    this.src = 'data:image;base64,' + btoa(this.arrayBufferToBase64(buf))                    
-                    //const temp = btoa(String.fromCharCode.apply(null, new Uint8Array(buf)))
-
-                    return
-                }
-            })
-            return
-        }
 
         const canvas = this.$refs.canvas
-
-        
-
-
         let img = new Image()
         img.onload = function(event) {
             
@@ -247,9 +218,41 @@ export default {
                 }
             })
         }.bind(this)
-        img.src = 'data:image;base64,' + data
         this.img = img
-        this.src = img.src
+
+        const json = this.$route.query.json
+
+        if(json) {
+            this.imageItem = JSON.parse(json)
+            this.init()
+            return
+        } 
+
+        const item = this.$route.query.item
+
+        if(item) {
+            const data = JSON.parse(item)            
+
+            PhotoLibrary.getPhoto(data.id).then(async ret => {
+                const buf = await ret.arrayBuffer()
+
+                if(buf && buf.byteLength) {
+                    this.img.src = 'data:image;base64,' + btoa(this.arrayBufferToBase64(buf))                    
+                    //const temp = btoa(String.fromCharCode.apply(null, new Uint8Array(buf)))
+
+                    return
+                }
+            })
+            return
+        }
+
+        
+
+        
+
+
+        
+        this.img.src = 'data:image;base64,' + data
     },
     unmounted() {
         return
@@ -257,14 +260,14 @@ export default {
     methods: {
         async init() {
             const ret = await PhotoGallery.getFile({
-                mediumId : this.image.id,
-                mediumType : this.image.mediumType,
-                mimeType : this.image.mimeType
+                mediumId : this.imageItem.id,
+                mediumType : this.imageItem.mediumType,
+                mimeType : this.imageItem.mimeType
             })
 
             this.data = ret.data;
 
-            this.src = 'data:' + (this.image.mimeType ?? 'image') + ';base64,'+ ret.byte;
+            this.img.src = 'data:' + (this.imageItem.mimeType ?? 'image') + ';base64,'+ ret.byte;
         },
         arrayBufferToBase64( buffer ) {
             var binary = '';
@@ -276,13 +279,15 @@ export default {
             return  binary;
         },
         onClickTest(){
-            const canvas = this.$refs.canvas
+            // const canvas = this.$refs.canvas
 
-            const ctx = canvas.getContext('2d')
+            // const ctx = canvas.getContext('2d')
 
-            const ret = canvas.toDataURL()
+            // const ret = canvas.toDataURL()
 
-            this.panzoom.smoothMoveTo(10, 0)
+            // this.panzoom.smoothMoveTo(10, 0)
+
+            this.cropEndAction()
 
             return
         },

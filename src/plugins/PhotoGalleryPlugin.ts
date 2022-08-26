@@ -33,5 +33,13 @@ export interface PhotoGalleryPlugin {
     
     cleanCache() : Promise<void>;
 
+    getThumbnail(opts : {
+        mediumId : string,
+        mediumType : string,
+        width : number,
+        height : number,
+        highQuality : boolean
+    }) : Promise<{ data : string }>
+
     test() : Promise<void>;
 }
