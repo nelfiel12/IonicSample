@@ -21,6 +21,9 @@
       <ion-button @click="$router.push('/lazyload')">Image LazaLoad</ion-button>
       <ion-button @click="$router.push('/canvas')">Crop sample</ion-button>
       <ion-button @click="onClickTest">Test activity</ion-button>
+      <ion-button @click="$router.push('/camera')">Camera</ion-button>
+      <ion-button @click="$router.push('/preview')">Preview</ion-button>
+
 
       <div id="container">
         <strong class="capitalize">{{ $route.params.id }}</strong>

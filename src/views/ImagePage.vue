@@ -151,6 +151,9 @@ export default {
             toAnimateRect : null
         }
     },
+    created() {
+        console.log('created')
+    },
     mounted() {
         console.log('mounted')
 
@@ -246,10 +249,12 @@ export default {
             return
         }
 
-        
+        const base64 = this.$route.query.base64
 
-        
-
+        if(base64) {
+            this.img.src = 'data:image;base64,' + base64
+            return
+        }
 
         
         this.img.src = 'data:image;base64,' + data

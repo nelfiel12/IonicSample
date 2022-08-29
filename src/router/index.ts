@@ -35,6 +35,14 @@ const routes: Array<RouteRecordRaw> = [
     path:'/canvas',
     component: () => import('../views/ImagePage.vue'),
   },
+  {
+    path:'/camera',
+    component: () => import('../views/CameraPage.vue'),
+  },
+  {
+    path:'/preview',
+    component: () => import('../views/CameraPreviewPage.vue'),
+  },
 ]
 
 const router = createRouter({
