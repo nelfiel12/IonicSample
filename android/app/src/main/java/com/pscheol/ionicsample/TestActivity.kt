@@ -1,5 +1,6 @@
 package com.pscheol.ionicsample
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -61,11 +62,17 @@ class TestActivity : AppCompatActivity() {
         binding = ActivityTestBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.buttonKakao.setOnClickListener() {
+            startActivity(Intent(this, KakaotestActivity::class.java))
+        }
+
         binding.tvAccessToken.text = NaverIdLoginSDK.getAccessToken()
         binding.tvRefreshToken.text = NaverIdLoginSDK.getRefreshToken()
         binding.tvExpires.text = NaverIdLoginSDK.getExpiresAt().toString()
         binding.tvType.text = NaverIdLoginSDK.getTokenType()
         binding.tvState.text = NaverIdLoginSDK.getState().toString()
+
+
 
         binding.buttonOAuthLoginImg.setOAuthLoginCallback(callabck)
 

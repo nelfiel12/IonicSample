@@ -8,11 +8,13 @@ import androidx.webkit.WebViewCompat;
 
 import com.getcapacitor.BridgeActivity;
 import com.pscheol.ionicsample.plugins.PhotoGalleryPlugin;
+import com.pscheol.ionicsample.plugins.SocialLoginPlugin;
 
 public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         registerPlugin(PhotoGalleryPlugin.class);
+        registerPlugin(SocialLoginPlugin.class);
         super.onCreate(savedInstanceState);
 
         PackageInfo info = WebViewCompat.getCurrentWebViewPackage(getApplicationContext());

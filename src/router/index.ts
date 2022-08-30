@@ -43,6 +43,10 @@ const routes: Array<RouteRecordRaw> = [
     path:'/preview',
     component: () => import('../views/CameraPreviewPage.vue'),
   },
+  {
+    path:'/social',
+    component: () => import('../views/SocialLoginPage.vue'),
+  },
 ]
 
 const router = createRouter({

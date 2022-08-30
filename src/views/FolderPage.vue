@@ -23,6 +23,7 @@
       <ion-button @click="onClickTest">Test activity</ion-button>
       <ion-button @click="$router.push('/camera')">Camera</ion-button>
       <ion-button @click="$router.push('/preview')">Preview</ion-button>
+      <ion-button @click="$router.push('/social')">Social</ion-button>
 
 
       <div id="container">

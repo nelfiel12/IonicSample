@@ -24,6 +24,13 @@
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:text="login" />
+
+
+        <Button
+            android:id="@+id/button_kakao"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="kakao" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 

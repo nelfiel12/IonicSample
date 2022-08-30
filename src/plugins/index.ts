@@ -1,5 +1,7 @@
 import { registerPlugin } from '@capacitor/core';
 import { PhotoGalleryPlugin } from './PhotoGalleryPlugin';
+import { SocialLoginPlugin } from './SocialLogin';
+
 
 const PhotoGallery = registerPlugin<PhotoGalleryPlugin>(
     'PhotoGallery',    
@@ -8,4 +10,10 @@ const PhotoGallery = registerPlugin<PhotoGalleryPlugin>(
     }
 );
 
-export { PhotoGallery };
+
+const SocialLogin = registerPlugin<SocialLoginPlugin>(
+    'SocialLogin'
+
+)
+
+export { PhotoGallery, SocialLogin };
