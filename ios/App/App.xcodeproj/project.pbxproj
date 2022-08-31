@@ -18,6 +18,8 @@
 		6E5EAD4128BDF5020085718A /* SocialLoginPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E5EAD4028BDF5020085718A /* SocialLoginPlugin.m */; };
 		6E5EAD8328BEFAA50085718A /* Test.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6E5EAD8228BEFAA50085718A /* Test.storyboard */; };
 		6E5EAD8528BEFD3C0085718A /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5EAD8428BEFD3C0085718A /* TestViewController.swift */; };
+		6E5EAD8F28BF46250085718A /* KakaoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5EAD8E28BF46250085718A /* KakaoService.swift */; };
+		6E5EAD9128BF5D970085718A /* RxCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5EAD9028BF5D970085718A /* RxCreator.swift */; };
 		6EBB2E2328BD9DBF000F4AAC /* PhotoGalleryPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EBB2E2228BD9DBF000F4AAC /* PhotoGalleryPlugin.swift */; };
 		6EBB2E2A28BDAC14000F4AAC /* SocialLoginPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EBB2E2928BDAC14000F4AAC /* SocialLoginPlugin.swift */; };
 		A084ECDBA7D38E1E42DFC39D /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */; };
@@ -37,6 +39,8 @@
 		6E5EAD4028BDF5020085718A /* SocialLoginPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SocialLoginPlugin.m; sourceTree = "<group>"; };
 		6E5EAD8228BEFAA50085718A /* Test.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Test.storyboard; sourceTree = "<group>"; };
 		6E5EAD8428BEFD3C0085718A /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
+		6E5EAD8E28BF46250085718A /* KakaoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoService.swift; sourceTree = "<group>"; };
+		6E5EAD9028BF5D970085718A /* RxCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RxCreator.swift; sourceTree = "<group>"; };
 		6EBB2E2228BD9DBF000F4AAC /* PhotoGalleryPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGalleryPlugin.swift; sourceTree = "<group>"; };
 		6EBB2E2928BDAC14000F4AAC /* SocialLoginPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialLoginPlugin.swift; sourceTree = "<group>"; };
 		AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -107,6 +111,8 @@
 				6EBB2E2928BDAC14000F4AAC /* SocialLoginPlugin.swift */,
 				6E5EAD3E28BDF4EE0085718A /* PhotoGalleryPlugin.m */,
 				6E5EAD4028BDF5020085718A /* SocialLoginPlugin.m */,
+				6E5EAD8E28BF46250085718A /* KakaoService.swift */,
+				6E5EAD9028BF5D970085718A /* RxCreator.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -239,7 +245,9 @@
 				6E5EAD4128BDF5020085718A /* SocialLoginPlugin.m in Sources */,
 				6EBB2E2328BD9DBF000F4AAC /* PhotoGalleryPlugin.swift in Sources */,
 				6E5EAD8528BEFD3C0085718A /* TestViewController.swift in Sources */,
+				6E5EAD8F28BF46250085718A /* KakaoService.swift in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				6E5EAD9128BF5D970085718A /* RxCreator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

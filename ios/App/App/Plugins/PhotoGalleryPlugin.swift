@@ -37,6 +37,14 @@ public class PhotoGalleryPlugin : CAPPlugin {
     }
     @objc public func test(_ call: CAPPluginCall) {
         print(#function)
+        
+        DispatchQueue.main.async {
+            let viewController = UIStoryboard(name: "Test", bundle: nil).instantiateViewController(identifier: "Test")
+            
+            self.bridge?.viewController?.present(viewController, animated: true)
+        }
+        
+        
         call.resolve()
     }
 }
