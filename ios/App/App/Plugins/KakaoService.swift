@@ -13,68 +13,57 @@ import KakaoSDKAuth
 
 class KakaoService {
     
+    static let errorObj = NSError(domain: "error", code: 0)
     
-    
-    func isKakaoTalkLoginAvailable2() -> Observable<Bool> {
-        
-        
-        return Observable<Bool>.create { observer in
-            observer.onNext(UserApi.isKakaoTalkLoginAvailable())
-            observer.onCompleted()
-            
-            
-            return Disposables.create()
+    func isKakaoTalkLoginAvailable() -> Single<Bool> {
+        return RxCreator<Bool>.create { observer in
+            observer(.success(UserApi.isKakaoTalkLoginAvailable()))
         }
     }
     
     
-    func isKakaoTalkLoginAvailable() -> Observable<Bool> {
-        return Observable<Bool>.create { observer in
-            observer.onNext(UserApi.isKakaoTalkLoginAvailable())
-            observer.onCompleted()
-            
-            
-            return Disposables.create()
-        }
-    }
-    
-    
-    private func loginWithKakao(observer: AnyObserver<KakaoSDKAuth.OAuthToken>, token: OAuthToken?, error: Error?) {
-        if(error != nil) {
-            observer.onError(error!)
-        } else if(token == nil) {
-            observer.onError(NSError(domain: "empty", code: 0))
+    private func loginWithKakao(observer: Single<OAuthToken>.SingleObserver, token: OAuthToken?, error: Error?) {
+        if(error != nil || token == nil) {
+            observer(.failure(error ?? KakaoService.errorObj))
         } else {
-            observer.onNext(token!)
-            observer.onCompleted()
+            observer(.success(token!))
+            
         }
     }
     
-    public func loginWithKakaoTalk() -> Observable<OAuthToken>{
-        return Observable<KakaoSDKAuth.OAuthToken>.create { observer in
+    public func loginWithKakaoTalk() -> Single<OAuthToken>{
+        return RxCreator<KakaoSDKAuth.OAuthToken>.create { observer in
             UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
                 
                 self.loginWithKakao(observer: observer, token: oauthToken, error: error)
                 
             }
             
-            return Disposables.create()
         }
     }
     
-    public func loginWithKakaoAccount() -> Observable<OAuthToken>{
-        return Observable<KakaoSDKAuth.OAuthToken>.create { observer in
+    public func loginWithKakaoAccount() -> Single<OAuthToken>{
+        
+        return RxCreator<KakaoSDKAuth.OAuthToken>.create { observer in
             UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
                 
                 self.loginWithKakao(observer: observer, token: oauthToken, error: error)
                 
             }
             
-            return Disposables.create()
         }
     }
     
-    public func me() {
-        
+    public func me() -> Single<User> {
+        return RxCreator<User>.create { observer in
+            UserApi.shared.me { user, error in
+                
+                if(error != nil || user == nil) {
+                    observer(.failure(error ?? KakaoService.errorObj))
+                } else {
+                    observer(.success(user!))
+                }
+            }
+        }
     }
 }

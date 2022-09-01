@@ -9,9 +9,10 @@ import Foundation
 import RxSwift
 
 public class RxCreator<T> {
-    static func create2(_ callback: @escaping (AnyObserver<T>) -> Void) ->Observable<T> {
-        return Observable<T>.create { observer in
+    static func create(_ callback: @escaping (@escaping Single<T>.SingleObserver) -> Void) ->Single<T> {
+        return Single<T>.create { observer in
             callback(observer)
+
             return Disposables.create()
         }
     }
